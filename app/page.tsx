@@ -44,7 +44,13 @@ export default function Page() {
             const data = await response.json();
 
             // Add AI response to chat
-            setMessages((prev) => [...prev, { text: data, sender: 'ai' }]);
+            setMessages((prev) => [
+                ...prev,
+                {
+                    text: typeof data === 'string' ? data : JSON.stringify(data),
+                    sender: 'ai',
+                },
+            ]);
         } catch (error) {
             console.error('Error:', error);
             setMessages((prev) => [
@@ -123,7 +129,9 @@ export default function Page() {
                                         }`}
                                         data-oid="ddipwh-"
                                     >
-                                        {message.text}
+                                        {typeof message.text === 'object'
+                                            ? JSON.stringify(message.text)
+                                            : message.text}
                                     </div>
                                 </div>
                             ))
