@@ -29,7 +29,8 @@ export default function Page() {
 
         try {
             // Send request to AI endpoint
-            const response = await fetch('http://localhost:8000/chat', {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+            const response = await fetch(`${apiUrl}/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -43,11 +44,33 @@ export default function Page() {
 
             const data = await response.json();
 
+            // Extract the message content from the response
+            let messageText;
+            if (typeof data === 'string') {
+                messageText = data;
+            } else if (typeof data === 'object') {
+                // Check for common response formats
+                if (data.message) {
+                    messageText = data.message;
+                } else if (data.text) {
+                    messageText = data.text;
+                } else if (data.content) {
+                    messageText = data.content;
+                } else if (data.response) {
+                    messageText = data.response;
+                } else {
+                    // Fallback if we can't identify a specific field
+                    messageText = JSON.stringify(data);
+                }
+            } else {
+                messageText = String(data);
+            }
+
             // Add AI response to chat
             setMessages((prev) => [
                 ...prev,
                 {
-                    text: typeof data === 'string' ? data : JSON.stringify(data),
+                    text: messageText,
                     sender: 'ai',
                 },
             ]);
@@ -94,7 +117,7 @@ export default function Page() {
                         Welcome to Max Gaspers Scott AI Assistant
                     </h2>
                     <p className="text-gray-600" data-oid="54222e.">
-                        Ask me any questions about Max Gaspers Scott and I'll provide you with
+                        Ask me any questions about Max Gaspers Scott and I&apos;ll provide you with
                         information. Try questions about his background, work, or interests!
                     </p>
                 </div>
@@ -129,9 +152,7 @@ export default function Page() {
                                         }`}
                                         data-oid="ddipwh-"
                                     >
-                                        {typeof message.text === 'object'
-                                            ? JSON.stringify(message.text)
-                                            : message.text}
+                                        {message.text}
                                     </div>
                                 </div>
                             ))
