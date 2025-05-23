@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 export const metadata: Metadata = {
     title: 'Max Gaspers Scott',
-    description: 'All you neet to know about me',
+    description: 'All you need to know about me',
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
